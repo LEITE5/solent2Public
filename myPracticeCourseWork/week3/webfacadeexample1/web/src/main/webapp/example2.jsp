@@ -29,8 +29,11 @@
     List<String> supportedAnimalTypes = (List<String>) session.getAttribute("supportedAnimalTypes");
 
     String animalNameStr = request.getParameter("animalName");
-    String animalTypeStr = request.getParameter("typeName");
-
+    String animalTypeStr = request.getParameter("animalType");
+    if (animalNameStr != null && animalTypeStr != null) {
+        farmFacade.addAnimal(animalTypeStr, animalNameStr);
+    }
+    
 
 %>
 
@@ -55,6 +58,15 @@
             <% for (String animalType : supportedAnimalTypes) {%>
             <tr>
                 <td><%=animalType%></td>
+                <td>
+                    <form action="./example2.jsp">
+                        <input type="hidden" name="animalType" value="<%=animalType %>">
+                        Animal Name:  <input type="text" name="animalName">
+                        <button type="submit" >create <%=animalType %></button>
+                    </form> 
+
+
+                </td>
             </tr>
             <%
                 }
@@ -78,6 +90,7 @@
                 }
             %>
         </table> 
+
 
     </body>
 </html>
