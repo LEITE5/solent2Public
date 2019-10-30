@@ -62,7 +62,15 @@ public class RestClientFarmFacadeTest {
 
     @Test
     public void testGetAnimalsOfType() {
-        fail("test not written");
+        LOG.debug("testGetAnimalsOfType() ");
+        String animalType = "Cat";
+        List<Animal> animals = farmFacade.getAnimalsOfType(animalType);
+        String msg = "returned :";
+        for(Animal animal :animals){
+            msg = msg+"\n     animal:"+animal;
+        }
+        LOG.debug(msg);
+        LOG.debug("end of testGetAnimalsOfType() ");
     }
 
     @Test
@@ -72,7 +80,22 @@ public class RestClientFarmFacadeTest {
 
     @Test
     public void testRemoveAnimal() {
-        fail("test not written");
+        LOG.debug("testRemoveAnimal()");
+        
+        //create animal
+        String animalType = "Cat";
+        String name = "randomName_" + new Date().getTime();
+        Animal animal = farmFacade.addAnimal(animalType, name);
+        
+        //remove it
+        if(farmFacade.removeAnimal(name) == true){
+        String msg = "removed :" + name;
+        LOG.debug(msg);
+        }
+        else{
+            fail("Animal not removed");
+        }
+        LOG.debug("end of testRemoveAnimal()");
     }
 
     @Test

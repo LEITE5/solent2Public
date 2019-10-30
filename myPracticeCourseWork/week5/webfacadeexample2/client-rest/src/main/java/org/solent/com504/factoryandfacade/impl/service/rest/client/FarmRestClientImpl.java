@@ -103,7 +103,20 @@ public class FarmRestClientImpl implements FarmFacade {
     @Override
     public List<Animal> getAnimalsOfType(String animalType) {
         LOG.debug("client getAnimalsOfType Called animalType=" + animalType);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Animal> animalList = null;
+
+        Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFilter.class));
+        WebTarget webTarget = client.target(baseUrl).path("getAnimalsOfType").queryParam("animalType", animalType);;
+
+        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_XML);
+        Response response = invocationBuilder.get();
+
+        ReplyMessage replyMessage = response.readEntity(ReplyMessage.class);
+        LOG.debug("Response status=" + response.getStatus() + " ReplyMessage: " + replyMessage);
+
+        animalList = replyMessage.getAnimalList().getAnimals();
+
+        return animalList;
     }
 
     @Override
@@ -114,8 +127,20 @@ public class FarmRestClientImpl implements FarmFacade {
 
     @Override
     public boolean removeAnimal(String animalName) {
-        LOG.debug("client removeAnimal Called animalName=" + animalName);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.debug("client removeAnimal Called =" + animalName);
+
+        Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFilter.class));
+        WebTarget webTarget = client.target(baseUrl).path("removeAnimal");
+
+        // this is how we construct html FORM variables
+        MultivaluedMap<String, String> formData = new MultivaluedHashMap<String, String>();
+        formData.add("animalName", animalName);
+        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_XML);
+        Response response = invocationBuilder.post(Entity.form(formData));
+
+        ReplyMessage replyMessage = response.readEntity(ReplyMessage.class);
+        LOG.debug("Response status=" + response.getStatus() + " ReplyMessage: " + replyMessage);
+        return true;
     }
 
 }

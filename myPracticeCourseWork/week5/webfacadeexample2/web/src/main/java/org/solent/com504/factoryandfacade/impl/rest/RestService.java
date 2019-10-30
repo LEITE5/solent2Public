@@ -74,11 +74,11 @@ public class RestService {
             List<Animal> animals = serviceFacade.getAllAnimals();
             replyMessage.getAnimalList().setAnimals(animals);
             replyMessage.getAnimalList().setCurrentMaxId(null);
-            
+
             replyMessage.setCode(Response.Status.OK.getStatusCode());
-            
+
             return Response.status(Response.Status.OK).entity(replyMessage).build();
-            
+
         } catch (Exception ex) {
             LOG.error("error calling /getAllAnimals ", ex);
             ReplyMessage replyMessage = new ReplyMessage();
@@ -150,14 +150,14 @@ public class RestService {
             FarmFacade serviceFacade = WebObjectFactory.getServiceFacade();
             ReplyMessage replyMessage = new ReplyMessage();
 
-            List<String> animalTypes = serviceFacade.getSupportedAnimalTypes();
-            replyMessage.getAnimalList().getAnimals().add((Animal) animalTypes);
+            List<Animal> animalList = serviceFacade.getAnimalsOfType(animalType);
+            replyMessage.getAnimalList().setAnimals(animalList);
+
             replyMessage.getAnimalList().setCurrentMaxId(null);
 
             replyMessage.setCode(Response.Status.OK.getStatusCode());
 
             return Response.status(Response.Status.OK).entity(replyMessage).build();
-
 
             //replyMessage.setCode(Response.Status.OK.getStatusCode());
             //return Response.status(Response.Status.OK).entity(replyMessage).build();
@@ -190,7 +190,6 @@ public class RestService {
 
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
-
             //replyMessage.setCode(Response.Status.OK.getStatusCode());
             //return Response.status(Response.Status.OK).entity(replyMessage).build();
         } catch (Exception ex) {
@@ -208,31 +207,35 @@ public class RestService {
      * http://localhost:8084/basicfacadeweb/rest/farmService/removeAnimal POST
      * not GET
      *
+     * @param animalType
      * @param animalName
      * @return ReplyMessage OK if deleted animal
      */
     @POST
     @Path("/removeAnimal")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeAnimal(@QueryParam("animalName") String animalName) {
+    public Response removeAnimal(@QueryParam("animalType") String animalType, @QueryParam("animalName") String animalName) {
         try {
-
             LOG.debug("/removeAnimal called animalName=" + animalName);
 
             FarmFacade serviceFacade = WebObjectFactory.getServiceFacade();
             ReplyMessage replyMessage = new ReplyMessage();
 
-            throw new UnsupportedOperationException("Not supported yet.");
+            if (serviceFacade.removeAnimal(animalName) == true) {
+                replyMessage.setCode(Response.Status.OK.getStatusCode());
+                return Response.status(Response.Status.OK).entity(replyMessage).build();
+            } else {
 
-            //replyMessage.setCode(Response.Status.OK.getStatusCode());
-            //return Response.status(Response.Status.OK).entity(replyMessage).build();
+                LOG.error("error calling /removeAnimal ");
+                replyMessage = new ReplyMessage();
+                replyMessage.setCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(replyMessage).build();
+            }
         } catch (Exception ex) {
-            LOG.error("error calling /removeAnimal ", ex);
-            ReplyMessage replyMessage = new ReplyMessage();
-            replyMessage.setCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
-            replyMessage.setDebugMessage("error calling /removeAnimal " + ex.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(replyMessage).build();
+
         }
+        return null;
     }
 
     /**
